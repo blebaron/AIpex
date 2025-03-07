@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const aiHostInput = document.getElementById("ai_host");
   const aiTokenInput = document.getElementById("ai_token");
   const aiModelInput = document.getElementById("ai_model");
+  const newTabModifierSelect = document.getElementById("new_tab_modifier");
   const saveAllSettingsButton = document.getElementById("saveAllSettings");
   const messageDiv = document.getElementById("message");
 
@@ -29,6 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
       "aiToken",
       "aiModel",
       "showSelectionToolbar",
+      "newTabModifier",
     ],
     function (result) {
       tabGroupCategoriesInput.value =
@@ -41,6 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
       aiModelInput.value = result.aiModel || "gpt-3.5-turbo";
       document.getElementById("show_selection_toolbar").checked =
         result.showSelectionToolbar ?? false;
+      newTabModifierSelect.value = result.newTabModifier || "ctrl"; // Default to Ctrl
     }
   );
 
@@ -56,6 +59,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const showSelectionToolbar = document.getElementById(
       "show_selection_toolbar"
     ).checked;
+    const newTabModifier = newTabModifierSelect.value;
 
     chrome.storage.sync.set(
       {
@@ -65,6 +69,7 @@ document.addEventListener("DOMContentLoaded", function () {
         aiToken: aiToken,
         aiModel: aiModel,
         showSelectionToolbar: showSelectionToolbar,
+        newTabModifier: newTabModifier,
       },
       function () {
         messageDiv.textContent = "All settings saved successfully.";
@@ -73,6 +78,14 @@ document.addEventListener("DOMContentLoaded", function () {
         }, 3000);
       }
     );
+  });
+
+  // Fix the shortcut change button functionality
+  document.getElementById("saveShortcut").addEventListener("click", function () {
+    chrome.tabs.create({ url: "chrome://extensions/shortcuts" }, () => {
+      messageDiv.textContent =
+        "Please set the new shortcut in the Chrome Extensions Shortcuts page.";
+    });
   });
 
   shortcutInput.addEventListener("click", function () {

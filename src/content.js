@@ -6,14 +6,21 @@ var aiModel = "";
 const conversations = [];
 
 let showSelectionToolbar = false;
+let newTabModifier = "ctrl"; // Default modifier key
 
-chrome.storage.sync.get(["showSelectionToolbar"], function (result) {
+chrome.storage.sync.get(["showSelectionToolbar", "newTabModifier"], function (result) {
   showSelectionToolbar = result.showSelectionToolbar ?? false;
+  newTabModifier = result.newTabModifier || "ctrl"; // Default to ctrl if not set
 });
 
 chrome.storage.onChanged.addListener((changes, namespace) => {
-  if (namespace === "sync" && changes.showSelectionToolbar) {
-    showSelectionToolbar = changes.showSelectionToolbar.newValue;
+  if (namespace === "sync") {
+    if (changes.showSelectionToolbar) {
+      showSelectionToolbar = changes.showSelectionToolbar.newValue;
+    }
+    if (changes.newTabModifier) {
+      newTabModifier = changes.newTabModifier.newValue;
+    }
   }
 });
 
@@ -966,6 +973,32 @@ $(document).ready(() => {
     alert(`Translated text: ${text}`);
   }
 
+  // Function to check if the specified modifier key is pressed
+  function isModifierPressed(e) {
+    if (newTabModifier === "none") return false;
+    
+    if (newTabModifier === "ctrl") {
+      return e.ctrlKey || e.metaKey; // metaKey for Mac Command key
+    } else if (newTabModifier === "shift") {
+      return e.shiftKey;
+    } else if (newTabModifier === "alt") {
+      return e.altKey;
+    }
+    
+    return false;
+  }
+
+  // Helper function for opening URLs based on modifier key
+  function openUrl(url, e, sameTab = false) {
+    if (isModifierPressed(e)) {
+      // Open in new tab when modifier is pressed
+      window.open(url, "_blank");
+    } else {
+      // Open in same tab or current tab based on preference
+      window.open(url, sameTab ? "_self" : "");
+    }
+  }
+
   // Search for an action in the aipex
   function search(e) {
     if (
@@ -1195,11 +1228,11 @@ $(document).ready(() => {
     } else if (
       $(".aipex-extension input").val().toLowerCase().startsWith("/history")
     ) {
-      window.open($(".aipex-item-active").attr("data-url"));
+      openUrl($(".aipex-item-active").attr("data-url"), e);
     } else if (
       $(".aipex-extension input").val().toLowerCase().startsWith("/bookmarks")
     ) {
-      window.open($(".aipex-item-active").attr("data-url"));
+      openUrl($(".aipex-item-active").attr("data-url"), e);
     } else {
       chrome.runtime.sendMessage({
         request: action.action,
@@ -1208,11 +1241,7 @@ $(document).ready(() => {
       });
       switch (action.action) {
         case "bookmark":
-          if (e.ctrlKey || e.metaKey) {
-            window.open(action.url);
-          } else {
-            window.open(action.url, "_self");
-          }
+          openUrl(action.url, e, true);
           break;
         case "scroll-bottom":
           window.scrollTo(0, document.body.scrollHeight);
@@ -1222,11 +1251,7 @@ $(document).ready(() => {
           window.scrollTo(0, 0);
           break;
         case "navigation":
-          if (e.ctrlKey || e.metaKey) {
-            window.open(action.url);
-          } else {
-            window.open(action.url, "_self");
-          }
+          openUrl(action.url, e, true);
           break;
         case "fullscreen":
           var elem = document.documentElement;
@@ -1244,18 +1269,10 @@ $(document).ready(() => {
           window.open("mailto:");
           break;
         case "url":
-          if (e.ctrlKey || e.metaKey) {
-            window.open(action.url);
-          } else {
-            window.open(action.url, "_self");
-          }
+          openUrl(action.url, e, true);
           break;
         case "goto":
-          // if (e.ctrlKey || e.metaKey) {
-          // 	window.open(addhttp($(".aipex-extension input").val()));
-          // } else {
-          window.open(addhttp($(".aipex-extension input").val()));
-          // }
+          openUrl(addhttp($(".aipex-extension input").val()), e);
           break;
         case "print":
           window.print();
