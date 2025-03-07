@@ -974,23 +974,23 @@ $(document).ready(() => {
   }
 
   // Function to check if the specified modifier key is pressed
-  function isModifierPressed(e) {
+  function isModifierPressed(event) {
     if (newTabModifier === "none") return false;
     
     if (newTabModifier === "ctrl") {
-      return e.ctrlKey || e.metaKey; // metaKey for Mac Command key
+      return event.ctrlKey || event.metaKey; // metaKey for Mac Command key
     } else if (newTabModifier === "shift") {
-      return e.shiftKey;
+      return event.shiftKey;
     } else if (newTabModifier === "alt") {
-      return e.altKey;
+      return event.altKey;
     }
     
     return false;
   }
 
   // Helper function for opening URLs based on modifier key
-  function openUrl(url, e, sameTab = false) {
-    if (isModifierPressed(e)) {
+  function openUrl(url, event, sameTab = false) {
+    if (isModifierPressed(event)) {
       // Open in new tab when modifier is pressed
       window.open(url, "_blank");
     } else {

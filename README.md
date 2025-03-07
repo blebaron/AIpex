@@ -47,8 +47,6 @@ AIpex offers a comprehensive suite of browsing tools, including a tab manager, b
 
 ⌨️ Keyboard Shortcuts: Streamline your browsing with customizable keyboard shortcuts
 
-🔑 Modifier Keys: Open results in new tabs by holding a modifier key (Ctrl, Shift, or Alt) while pressing Enter
-
 ⚙️ Troubleshooting Tools: Advanced settings to help troubleshoot browsing issues
 
 🌙 Dark Mode: Enjoy a distraction-free dark mode
@@ -66,8 +64,6 @@ To open AIPex, simply press `⌘+M` . You can change the shortcut when clicking 
 To use AI features in AIpex, you can click the AIpex in chrome toobar, and then you can customize shorcut or set AI parameters
 
 ![AIPex configure](src/screenshots/settings.png)
-
-You can also customize the modifier key used to open results in new tabs. By default, holding &#8984; / Ctrl while pressing Enter will open the result in a new tab. AIpex uses a cross-platform notation showing both Mac and Windows/Linux key equivalents (&#8984; / Ctrl, &#8679; / Shift, &#8997; / Alt).
 
 ### Closing AIpex
 
