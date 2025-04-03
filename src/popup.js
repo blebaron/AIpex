@@ -11,6 +11,12 @@ document.addEventListener("DOMContentLoaded", function () {
   const saveAllSettingsButton = document.getElementById("saveAllSettings");
   const messageDiv = document.getElementById("message");
 
+  // Detect platform (Mac or non-Mac)
+  const isMac = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+  
+  // Populate the modifier key dropdown based on platform
+  populateModifierOptions(newTabModifierSelect, isMac);
+
   // Load current shortcut
   chrome.commands.getAll(function (commands) {
     const openaipexCommand = commands.find(
@@ -43,7 +49,14 @@ document.addEventListener("DOMContentLoaded", function () {
       aiModelInput.value = result.aiModel || "gpt-3.5-turbo";
       document.getElementById("show_selection_toolbar").checked =
         result.showSelectionToolbar ?? false;
-      newTabModifierSelect.value = result.newTabModifier || "ctrl"; // Default to Ctrl
+      
+      // Set default modifier based on platform if not already set
+      if (result.newTabModifier) {
+        newTabModifierSelect.value = result.newTabModifier;
+      } else {
+        // Default to platform-appropriate modifier
+        newTabModifierSelect.value = isMac ? "meta" : "ctrl";
+      }
     }
   );
 
@@ -107,4 +120,34 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
   });
+
+  // Function to populate modifier options based on platform
+  function populateModifierOptions(selectElement, isMac) {
+    // Clear any existing options
+    selectElement.innerHTML = "";
+    
+    if (isMac) {
+      // Mac options with symbols
+      addOption(selectElement, "meta", "⌘ Command");
+      addOption(selectElement, "ctrl", "⌃ Control");
+      addOption(selectElement, "alt", "⌥ Option");
+      addOption(selectElement, "shift", "⇧ Shift");
+    } else {
+      // Windows/Linux options
+      addOption(selectElement, "ctrl", "Ctrl");
+      addOption(selectElement, "alt", "Alt");
+      addOption(selectElement, "shift", "Shift");
+    }
+    
+    // Add disabled option for both platforms
+    addOption(selectElement, "none", "Disabled");
+  }
+  
+  // Helper function to add option to select element
+  function addOption(selectElement, value, text) {
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = text;
+    selectElement.appendChild(option);
+  }
 });

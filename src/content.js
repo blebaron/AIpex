@@ -977,15 +977,18 @@ $(document).ready(() => {
   function isModifierPressed(event) {
     if (newTabModifier === "none") return false;
     
-    if (newTabModifier === "ctrl") {
-      return event.ctrlKey || event.metaKey; // metaKey for Mac Command key
-    } else if (newTabModifier === "shift") {
-      return event.shiftKey;
-    } else if (newTabModifier === "alt") {
-      return event.altKey;
+    switch (newTabModifier) {
+      case "ctrl":
+        return event.ctrlKey;
+      case "meta":
+        return event.metaKey; // Command key on Mac
+      case "shift":
+        return event.shiftKey;
+      case "alt":
+        return event.altKey;
+      default:
+        return false;
     }
-    
-    return false;
   }
 
   // Helper function for opening URLs based on modifier key
@@ -1412,122 +1415,9 @@ $(document).ready(() => {
   $(document).on("keyup", ".aipex-extension input", search);
   $(document).on("click", ".aipex-item-active", handleAction);
   $(document).on("click", ".aipex-extension #aipex-overlay", closeaipex);
-  waitForElement("#aipex-drag-icon", function (element) {
-    const $dragIcon = $("#aipex-drag-icon");
-    let isDragging = false;
-    let startX, startY;
-    let initialLeft, initialTop;
-    let isMove = false;
-
-    $dragIcon.css({
-      cursor: "pointer",
-      "touch-action": "none",
-    });
-
-    $dragIcon.on("mousedown", function (e) {
-      console.log("mouse down");
-      e.preventDefault();
-      isDragging = true;
-
-      startX = e.clientX;
-      startY = e.clientY;
-
-      const style = window.getComputedStyle($dragIcon[0]);
-      initialLeft = parseInt(style.left, 10) || 0;
-      initialTop = parseInt(style.top, 10) || 0;
-
-      $(document).on("mouseup", handleMouseUp);
-
-      $dragIcon.css("cursor", "move");
-
-      $("body").append(
-        '<style id="drag-cursor-style">* { cursor: move !important; }</style>'
-      );
-    });
-
-    $("#aipex-icon").on("mouseover", function (e) {
-      $(this).attr(
-        "src",
-        "https://miro.medium.com/v2/resize:fit:720/format:webp/1*dovpu-gbULPxot3OmL2eEQ.png"
-      );
-    });
-
-    $("#aipex-icon").on("mouseout", function (e) {
-      $(this).attr(
-        "src",
-        "https://miro.medium.com/v2/resize:fit:720/format:webp/1*gHH5bC3nCpzRVXu7UdT0ZQ.png"
-      );
-    });
-
-    $(document).on("mousemove", { capture: true }, function (e) {
-      if (!isDragging) return;
-      isMove = true;
-
-      const deltaX = e.clientX - startX;
-      const deltaY = e.clientY - startY;
-
-      const newLeft = initialLeft + deltaX;
-      const newTop = initialTop + deltaY;
-
-      $dragIcon.css({
-        left: `${newLeft}px`,
-        top: `${newTop}px`,
-        position: "fixed",
-      });
-    });
-
-    function handleMouseUp() {
-      console.log("mouse up");
-      isDragging = false;
-      $(document).off("mouseup", handleMouseUp);
-
-      $dragIcon.css("cursor", "pointer");
-
-      $("#drag-cursor-style").remove();
-
-      if (!isMove) {
-        openaipex();
-      }
-
-      isMove = false;
-    }
-  });
-
-  // document.addEventListener("selectionchange", function () {
-  //   if (!showSelectionToolbar) return;
-
-  //   const selection = window.getSelection();
-  //   const selectedText = selection.toString().trim();
-
-  //   if (selectedText) {
-  //     const range = selection.getRangeAt(0);
-  //     const rect = range.getBoundingClientRect();
-
-  //     let toolbar = document.getElementById("aipex-selection-toolbar");
-  //     if (!toolbar) {
-  //       toolbar = document.createElement("div");
-  //       toolbar.id = "aipex-selection-toolbar";
-  //       document.body.appendChild(toolbar);
-  //     }
-
-  //     toolbar.style.top = `${rect.top + window.scrollY - 45}px`;
-  //     toolbar.style.left = `${rect.left + window.scrollX}px`;
-  //     toolbar.style.display = "flex";
-
-  //     toolbar.querySelector("#aipex-ask-ai").onclick = () => {
-  //       openAIChatDrawer(selectedText);
-  //     };
-
-  //     toolbar.querySelector("#aipex-translate").onclick = () => {
-  //       openAIChatDrawer(`Translate the following text: ${selectedText}`);
-  //     };
-  //   } else {
-  //     const toolbar = document.getElementById("aipex-selection-toolbar");
-  //     if (toolbar) {
-  //       toolbar.style.display = "none";
-  //     }
-  //   }
-  // });
+  
+  // Remove the floating action button implementation
+  // waitForElement("#aipex-drag-icon", function (element) { ... });
 
   document.addEventListener("click", function (e) {
     if (!e.target.closest("#aipex-selection-toolbar")) {
